@@ -1,22 +1,19 @@
 {
   "name": "@aftermark/cli",
   "version": "1.0.0-alpha.1",
-  "description": "Process static site generator-built HTML using plugins.",
+  "description": "CLI for Aftermark, a pluggable DOM-based HTML postprocessor.",
+  "main": "./bin/aftermark-cli.js",
+  "author": "Mihira Jayasekera <open-source@tinymachine.net>",
+  "license": "MIT",
+  "repository": "https://github.com/aftermark/aftermark/tree/master/packages/cli",
+  "bugs": "https://github.com/aftermark/aftermark/issues",
   "keywords": [
     "aftermark",
-    "static site",
-    "static site generator",
-    "static",
-    "ssg"
+    "postprocessor",
+    "jsdom",
+    "ssg",
+    "static site generator"
   ],
-  "author": "Mihira Jayasekera <open-source@tinymachine.net>",
-  "repository": {
-    "type" : "git",
-    "url" : "https://github.com/aftermark/cli.git"
-  },
-  "bugs": "https://github.com/aftermark/cli/issues",
-  "license": "ISC",
-  "main": "./bin/aftermark-cli.js",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w"
