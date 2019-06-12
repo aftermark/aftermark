@@ -2,6 +2,7 @@
   "name": "@aftermark/longlist-tagger",
   "version": "1.0.0-alpha.2",
   "description": "Aftermark plugin that adds a class to <ul> and <ol> elements containing more than a specified number of child <li> elements.",
+  "repository": "https://github.com/aftermark/aftermark/tree/master/packages/plugins/longlist-tagger",
   "keywords": [
     "aftermark",
     "lists",
