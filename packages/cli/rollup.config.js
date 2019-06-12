@@ -18,20 +18,5 @@ export default [
         exclude: "node_modules/**" // only transpile our source code
       })
     ]
-    // }
-    // {
-    //   input: "src/reduceClassMap.js",
-    //   output: [
-    //     {
-    //       file: "lib/funkdafyClasses.js",
-    //       format: "cjs"
-    //     }
-    //   ],
-    //   plugins: [
-    //     resolve(),
-    //     babel({
-    //       exclude: "node_modules/**" // only transpile our source code
-    //     })
-    //   ]
   }
 ];
