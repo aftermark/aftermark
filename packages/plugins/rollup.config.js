@@ -1,6 +1,6 @@
 import resolve from "rollup-plugin-node-resolve";
 import babel from "rollup-plugin-babel";
-import pkg from "./package.json";
+const pkg = require(`${process.cwd()}/package.json`);
 
 export default [
   {
@@ -15,7 +15,7 @@ export default [
       resolve(),
       babel({
         exclude: "node_modules/**", // only transpile our source code
-        rootMode: "upward"
+        rootMode: "upward" // find babel.config.js in root
       })
     ]
   }
