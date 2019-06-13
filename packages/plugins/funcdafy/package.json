@@ -23,6 +23,9 @@
   "engines": {
     "node": "*"
   },
+  "peerDependencies": {
+    "@aftermark/cli": "^1.0.0-alpha.2"
+  },
   "dependencies": {
     "js-yaml": "^3.13.1"
   }

@@ -21,6 +21,9 @@
   "engines": {
     "node": "*"
   },
+  "peerDependencies": {
+    "@aftermark/cli": "^1.0.0-alpha.2"
+  },
   "dependencies": {
     "glob": "^7.1.3"
   }
