@@ -17,13 +17,14 @@ var jsdom = require("jsdom");
 
 var JSDOM = jsdom.JSDOM;
 var startTime = Date.now();
-var commandName = Object.keys(pkg.bin)[0]; // Find config file
+var commandName = Object.keys(pkg.bin)[0];
+var commandNameAndVer = commandName + " " + pkg.version; // Find config file
 
 var explorer = cosmiconfig(commandName);
 var result = explorer.searchSync();
 
 if (!result) {
-  logError("".concat(commandName, " couldn't find a config file."));
+  logError("".concat(commandNameAndVer, " couldn't find a config file."));
 } else {
   var config = result.config; // process source files
 
@@ -78,7 +79,7 @@ function logError(msg) {
 
 function logConfirmation(config, files) {
   var elapsedTime = Date.now() - startTime;
-  var msg = "===\n".concat(commandName, " completed in ").concat(elapsedTime, "ms.\n");
+  var msg = "===\n".concat(commandNameAndVer, " completed in ").concat(elapsedTime, "ms.\n");
   msg += "\n\uD83E\uDDE9 Plugins (in run-order):\n";
   Object.keys(config.plugins).forEach(function (pluginName) {
     msg += "   \u2022 ".concat(pluginName, "\n");

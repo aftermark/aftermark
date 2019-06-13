@@ -9,13 +9,14 @@ const { JSDOM } = jsdom;
 
 const startTime = Date.now();
 const commandName = Object.keys(pkg.bin)[0];
+const commandNameAndVer = commandName + " " + pkg.version;
 
 // Find config file
 const explorer = cosmiconfig(commandName);
 const result = explorer.searchSync();
 
 if (!result) {
-  logError(`${commandName} couldn't find a config file.`);
+  logError(`${commandNameAndVer} couldn't find a config file.`);
 } else {
   const config = result.config;
 
@@ -75,7 +76,7 @@ function logError(msg) {
 function logConfirmation(config, files) {
   const elapsedTime = Date.now() - startTime;
 
-  let msg = `===\n${commandName} completed in ${elapsedTime}ms.\n`;
+  let msg = `===\n${commandNameAndVer} completed in ${elapsedTime}ms.\n`;
 
   msg += `\n🧩 Plugins (in run-order):\n`;
   Object.keys(config.plugins).forEach(pluginName => {
