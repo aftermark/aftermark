@@ -1,6 +1,6 @@
 {
   "name": "@aftermark/funcdafy",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "Aftermark plugin that adds functional CSS classes (or other classes) to your static site's HTML after it's been generated.",
   "main": "./lib/aftermark-funcdafy.js",
   "author": "Mihira Jayasekera <open-source@tinymachine.net>",
