@@ -25,20 +25,5 @@
   },
   "dependencies": {
     "js-yaml": "^3.13.1"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.js": [
-      "eslint --fix",
-      "git add"
-    ],
-    "*.{md,html}": [
-      "prettier --write",
-      "git add"
-    ]
   }
 }
