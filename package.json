@@ -5,6 +5,10 @@
     "packages/cli",
     "packages/plugins/*"
   ],
+  "scripts": {
+    "build": "lerna run build",
+    "dev": "lerna run --parallel dev"
+  },
   "devDependencies": {
     "@babel/core": "^7.4.0",
     "@babel/preset-env": "^7.4.2",
