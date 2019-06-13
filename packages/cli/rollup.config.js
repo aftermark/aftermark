@@ -4,7 +4,7 @@ import pkg from "./package.json";
 
 export default [
   {
-    input: "src/main.js",
+    input: "./src/main.js",
     output: [
       {
         file: pkg.main,
@@ -15,7 +15,8 @@ export default [
     plugins: [
       resolve(),
       babel({
-        exclude: "node_modules/**" // only transpile our source code
+        exclude: "node_modules/**", // only transpile our source code
+        rootMode: "upward"
       })
     ]
   }
