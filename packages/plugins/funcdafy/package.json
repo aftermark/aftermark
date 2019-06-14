@@ -16,10 +16,6 @@
     "ssg",
     "static site generator"
   ],
-  "scripts": {
-    "build": "rollup -c ../rollup.config.js",
-    "dev": "rollup -c ../rollup.config.js -w"
-  },
   "engines": {
     "node": "*"
   },

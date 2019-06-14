@@ -14,10 +14,6 @@
     "ssg",
     "static site generator"
   ],
-  "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c -w"
-  },
   "bin": {
     "aftermark": "./bin/aftermark-cli.js"
   },

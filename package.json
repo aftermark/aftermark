@@ -6,8 +6,8 @@
     "packages/plugins/*"
   ],
   "scripts": {
-    "build": "lerna run build",
-    "dev": "lerna run --parallel dev"
+    "build": "rollup -c",
+    "dev": "rollup -c -w"
   },
   "devDependencies": {
     "@babel/core": "^7.4.0",
