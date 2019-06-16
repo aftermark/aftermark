@@ -49,15 +49,14 @@ var pkg = require("../package.json");
 var cosmiconfig = require("cosmiconfig");
 
 function getConfig() {
-  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var startTime = new Date();
   var commandName = Object.keys(pkg.bin)[0];
   var commandNameAndVer = "".concat(commandName, " ").concat(pkg.version);
-  options.debug && (commandNameAndVer += " [build ".concat(startTime.toLocaleTimeString(), "]"));
   var explorer = cosmiconfig(commandName);
   var result = explorer.searchSync();
 
   if (result) {
+    result.config.debugMode && (commandNameAndVer += " [build ".concat(startTime.toLocaleTimeString(), "]"));
     result.config.commandName = commandName;
     result.config.commandNameAndVer = commandNameAndVer;
     result.config.startTime = startTime;
@@ -72,11 +71,11 @@ function logConfirmation(config, files) {
   var msg = "===\n".concat(config.commandNameAndVer, " completed in ").concat(elapsedTime, "s.\n");
   msg += "\n\uD83E\uDDE9 Plugins (in run-order):\n";
   Object.keys(config.plugins).forEach(function (pluginName) {
-    msg += "   \u2022 ".concat(pluginName, "\n");
+    msg += "   - ".concat(pluginName, "\n");
   });
   msg += "\n\uD83D\uDCC4 Processed files (".concat(files.length, "):\n");
   files.forEach(function (file) {
-    msg += "   \u2022 ".concat(file);
+    msg += "   - ".concat(file);
     var outputFile = getOutputFile(file, config.output);
 
     if (config.output && file !== outputFile) {
@@ -96,18 +95,20 @@ var JSDOM = require("jsdom").JSDOM;
 
 (function () {
   try {
-    var config = getConfig({
-      debug: true
-    }); // get array of filenames to process
+    var config = getConfig(); // get array of filenames to process
 
-    var files = glob.sync(config.input);
+    var files = glob.sync(config.input); // get array of promised modified doms;
+    // export as files if not in bufferMode
+
     var promisedDomsSerialized = files.map(function (file) {
       return JSDOM.fromFile(file).then(function (dom) {
         var updatedDom = applyPlugins(config.plugins, dom);
-        exportFile(file, config.output, updatedDom);
+        !config.bufferMode && exportFile(file, config.output, updatedDom);
         return updatedDom.serialize();
       });
-    });
+    }); // once promised doms are resolved,
+    // show confirmation and return result
+
     Promise.all(promisedDomsSerialized).then(function (result) {
       logConfirmation(config, files);
       return result;
