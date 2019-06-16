@@ -1,0 +1,7 @@
++mixin: mixin-1 mixin-2
+
+h1: header-1
+p:
+  - paragraph
+  - span: paragraph-span
+h1, p: +mixin
