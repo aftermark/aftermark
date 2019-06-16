@@ -1,42 +1,12 @@
 #!/usr/bin/env node
 'use strict';
 
-var pkg = require("../package.json");
-
 var chalk = require("chalk");
 
-var cosmiconfig = require("cosmiconfig");
-
-var fs = require("fs");
-
-var path = require("path");
-
-var glob = require("glob");
-
-var jsdom = require("jsdom");
-
-var JSDOM = jsdom.JSDOM;
-var startTime = Date.now();
-var commandName = Object.keys(pkg.bin)[0];
-var commandNameAndVer = commandName + " " + pkg.version; // Find config file
-
-var explorer = cosmiconfig(commandName);
-var result = explorer.searchSync();
-
-if (!result) {
-  logError("".concat(commandNameAndVer, " couldn't find a config file."));
-} else {
-  var config = result.config; // process source files
-
-  glob(config.input, function (er, files) {
-    files.forEach(function (file) {
-      JSDOM.fromFile(file, {}).then(function (dom) {
-        var updatedDom = applyPlugins(config.plugins, dom);
-        exportFile(file, config.output, updatedDom);
-      });
-    });
-    logConfirmation(config, files);
-  });
+function logError(msg) {
+  var log = console.error;
+  log(chalk.yellowBright(msg));
+  log();
 }
 
 function applyPlugins(plugins, dom) {
@@ -53,14 +23,7 @@ function applyPlugins(plugins, dom) {
   return dom;
 }
 
-function exportFile(file, outputDir, updatedDom) {
-  var outputFile = getOutputFile(file, outputDir);
-  fs.writeFile(outputFile, updatedDom.serialize(), function (error) {
-    if (error) {
-      throw error;
-    }
-  });
-}
+var path = require("path");
 
 function getOutputFile(file, outputDir) {
   var fileName = path.parse(file).base;
@@ -71,15 +34,42 @@ function getOutputFile(file, outputDir) {
   }
 }
 
-function logError(msg) {
-  var log = console.error;
-  log(chalk.yellowBright(msg));
-  log();
+var fs = require("fs");
+function exportFile(file, outputDir, updatedDom) {
+  var outputFile = getOutputFile(file, outputDir);
+  fs.writeFile(outputFile, updatedDom.serialize(), function (error) {
+    if (error) {
+      throw error;
+    }
+  });
+}
+
+var pkg = require("../package.json");
+
+var cosmiconfig = require("cosmiconfig");
+
+function getConfig() {
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var startTime = new Date();
+  var commandName = Object.keys(pkg.bin)[0];
+  var commandNameAndVer = "".concat(commandName, " ").concat(pkg.version);
+  options.debug && (commandNameAndVer += " [build ".concat(startTime.toLocaleTimeString(), "]"));
+  var explorer = cosmiconfig(commandName);
+  var result = explorer.searchSync();
+
+  if (result) {
+    result.config.commandName = commandName;
+    result.config.commandNameAndVer = commandNameAndVer;
+    result.config.startTime = startTime;
+    return result.config;
+  } else {
+    throw new Error("".concat(commandNameAndVer, " couldn't find a config file."));
+  }
 }
 
 function logConfirmation(config, files) {
-  var elapsedTime = Date.now() - startTime;
-  var msg = "===\n".concat(commandNameAndVer, " completed in ").concat(elapsedTime, "ms.\n");
+  var elapsedTime = ((Date.now() - config.startTime) / 1000).toFixed(2);
+  var msg = "===\n".concat(config.commandNameAndVer, " completed in ").concat(elapsedTime, "s.\n");
   msg += "\n\uD83E\uDDE9 Plugins (in run-order):\n";
   Object.keys(config.plugins).forEach(function (pluginName) {
     msg += "   \u2022 ".concat(pluginName, "\n");
@@ -99,3 +89,30 @@ function logConfirmation(config, files) {
   });
   console.log(msg);
 }
+
+var glob = require("glob");
+
+var JSDOM = require("jsdom").JSDOM;
+
+(function () {
+  try {
+    var config = getConfig({
+      debug: true
+    }); // get array of filenames to process
+
+    var files = glob.sync(config.input);
+    var promisedDomsSerialized = files.map(function (file) {
+      return JSDOM.fromFile(file).then(function (dom) {
+        var updatedDom = applyPlugins(config.plugins, dom);
+        exportFile(file, config.output, updatedDom);
+        return updatedDom.serialize();
+      });
+    });
+    Promise.all(promisedDomsSerialized).then(function (result) {
+      logConfirmation(config, files);
+      return result;
+    });
+  } catch (e) {
+    logError(e);
+  }
+})();
