@@ -7,12 +7,12 @@ export function logConfirmation(config, files) {
 
   msg += `\n🧩 Plugins (in run-order):\n`;
   Object.keys(config.plugins).forEach(pluginName => {
-    msg += `   • ${pluginName}\n`;
+    msg += `   - ${pluginName}\n`;
   });
 
   msg += `\n📄 Processed files (${files.length}):\n`;
   files.forEach(file => {
-    msg += `   • ${file}`;
+    msg += `   - ${file}`;
     const outputFile = getOutputFile(file, config.output);
     if (config.output && file !== outputFile) {
       msg += ` → ${outputFile}`;
