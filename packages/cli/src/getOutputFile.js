@@ -1,12 +1,6 @@
 const path = require("path");
 
-export function getOutputFile(file, outputDir) {
-  const fileName = path.parse(file).base;
-  return outputDir ? getOutputFilePath(fileName) : file;
-
-  function getOutputFilePath(fileName) {
-    return outputDir.endsWith("/")
-      ? outputDir + fileName
-      : outputDir + "/" + fileName;
-  }
+export function getOutputFile(file, configFilePath, outputDir = "") {
+  const fileName = path.basename(file);
+  return outputDir ? path.join(configFilePath, outputDir, fileName) : file;
 }

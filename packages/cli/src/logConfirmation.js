@@ -1,3 +1,4 @@
+const path = require("path");
 import { getOutputFile } from "./getOutputFile";
 
 export function logConfirmation(config, files) {
@@ -12,10 +13,15 @@ export function logConfirmation(config, files) {
 
   msg += `\n📄 Processed files (${files.length}):\n`;
   files.forEach(file => {
-    msg += `   - ${file}`;
-    const outputFile = getOutputFile(file, config.output);
+    msg += `   - ${path.relative(config.configFilePath, file)}`;
+    const outputFile = getOutputFile(
+      file,
+      config.configFilePath,
+      config.output
+    );
     if (config.output && file !== outputFile) {
-      msg += ` → ${outputFile}`;
+      // not saved in place
+      msg += ` → ${path.relative(config.configFilePath, outputFile)}`;
     } else {
       msg += " (saved in place)";
     }

@@ -4,6 +4,7 @@ const JSDOM = require("jsdom").JSDOM;
 import { applyPlugins } from "./applyPlugins";
 import { exportFile } from "./exportFile";
 import { getConfig } from "./getConfig";
+import { getOutputFile } from "./getOutputFile";
 import { logConfirmation } from "./logConfirmation";
 import { logError } from "./logError";
 
@@ -24,7 +25,14 @@ import { logError } from "./logError";
           config.configFilePath,
           dom
         );
-        !config.bufferMode && exportFile(file, config.output, updatedDom);
+        if (!config.bufferMode) {
+          const outputFile = getOutputFile(
+            file,
+            config.configFilePath,
+            config.output
+          );
+          exportFile(outputFile, updatedDom);
+        }
         return updatedDom.serialize();
       });
     });

@@ -24,20 +24,9 @@ function applyPlugins(plugins, configFilePath, dom) {
   return dom;
 }
 
-var path = require("path");
-
-function getOutputFile(file, outputDir) {
-  var fileName = path.parse(file).base;
-  return outputDir ? getOutputFilePath(fileName) : file;
-
-  function getOutputFilePath(fileName) {
-    return outputDir.endsWith("/") ? outputDir + fileName : outputDir + "/" + fileName;
-  }
-}
-
 var fs = require("fs");
-function exportFile(file, outputDir, updatedDom) {
-  var outputFile = getOutputFile(file, outputDir);
+
+function exportFile(outputFile, updatedDom) {
   fs.writeFile(outputFile, updatedDom.serialize(), function (error) {
     if (error) {
       throw error;
@@ -47,7 +36,7 @@ function exportFile(file, outputDir, updatedDom) {
 
 var fs$1 = require("fs");
 
-var path$1 = require("path");
+var path = require("path");
 
 var pkg = require("../package.json");
 
@@ -61,7 +50,7 @@ function getConfig() {
   var result = explorer.searchSync();
 
   if (result) {
-    result.config.configFilePath = path$1.dirname(result.filepath);
+    result.config.configFilePath = path.dirname(result.filepath);
     result.config.commandName = commandName;
     result.config.commandNameAndVer = updateCmdNameAndVer(commandNameAndVer);
     result.config.startTime = startTime;
@@ -83,6 +72,15 @@ function getConfig() {
   }
 }
 
+var path$1 = require("path");
+
+function getOutputFile(file, configFilePath) {
+  var outputDir = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
+  var fileName = path$1.basename(file);
+  return outputDir ? path$1.join(configFilePath, outputDir, fileName) : file;
+}
+
+var path$2 = require("path");
 function logConfirmation(config, files) {
   var elapsedTime = ((Date.now() - config.startTime) / 1000).toFixed(2);
   var msg = "===\n".concat(config.commandNameAndVer, " completed in ").concat(elapsedTime, "s.\n");
@@ -92,11 +90,12 @@ function logConfirmation(config, files) {
   });
   msg += "\n\uD83D\uDCC4 Processed files (".concat(files.length, "):\n");
   files.forEach(function (file) {
-    msg += "   - ".concat(file);
-    var outputFile = getOutputFile(file, config.output);
+    msg += "   - ".concat(path$2.relative(config.configFilePath, file));
+    var outputFile = getOutputFile(file, config.configFilePath, config.output);
 
     if (config.output && file !== outputFile) {
-      msg += " \u2192 ".concat(outputFile);
+      // not saved in place
+      msg += " \u2192 ".concat(path$2.relative(config.configFilePath, outputFile));
     } else {
       msg += " (saved in place)";
     }
@@ -121,7 +120,12 @@ var JSDOM = require("jsdom").JSDOM;
     var promisedDomsSerialized = files.map(function (file) {
       return JSDOM.fromFile(file).then(function (dom) {
         var updatedDom = applyPlugins(config.plugins, config.configFilePath, dom);
-        !config.bufferMode && exportFile(file, config.output, updatedDom);
+
+        if (!config.bufferMode) {
+          var outputFile = getOutputFile(file, config.configFilePath, config.output);
+          exportFile(outputFile, updatedDom);
+        }
+
         return updatedDom.serialize();
       });
     }); // once promised doms are resolved,
