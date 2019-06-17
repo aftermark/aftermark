@@ -12,7 +12,7 @@ function logError(msg) {
 function applyPlugins(plugins, configFilePath, dom) {
   Object.keys(plugins).forEach(function (pluginName) {
     try {
-      var plugin = require("".concat(process.cwd(), "/node_modules/").concat(pluginName));
+      var plugin = require(pluginName);
 
       var pluginOptions = plugins[pluginName];
       pluginOptions.configFilePath = configFilePath;
