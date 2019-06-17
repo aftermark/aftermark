@@ -2,7 +2,8 @@ const JSDOM = require("jsdom").JSDOM;
 const path = require("path");
 const readFileSync = require("fs").readFileSync;
 
-const plugin = require("@aftermark/funcdafy");
+const pluginName = "funcdafy";
+const plugin = require(`@aftermark/${pluginName}`);
 const fixtures = path.join(__dirname, "fixtures");
 
 test("@aftermark/funcdafy adds classes from class map correctly", () => {
@@ -10,8 +11,6 @@ test("@aftermark/funcdafy adds classes from class map correctly", () => {
 });
 
 function compare() {
-  const pluginName = "funcdafy";
-
   const inputDom = new JSDOM(
     readFileSync(path.join(fixtures, `${pluginName}.html`), "utf8")
   );
@@ -21,7 +20,7 @@ function compare() {
   );
 
   const outputDom = plugin(inputDom, {
-    classMapFile: `packages/plugins/${pluginName}/test/fixtures/${pluginName}.classMap.yml`
+    classMapFile: path.join(fixtures, `${pluginName}.classMap.yml`)
   });
 
   return outputDom.serialize() === expectedDom.serialize();
