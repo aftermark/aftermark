@@ -177,13 +177,16 @@ function applyClasses (dom, classMap) {
 
 var fs = require("fs");
 
+var path = require("path");
+
 var yaml = require("js-yaml");
 
 module.exports = function (dom, options) {
   if (!options.classMapFile) {
     throw new Error("Missing required option `classMapFile` with a path to a valid JSON or YAML class map.");
   } else {
-    var classMapFilePath = process.cwd() + "/" + options.classMapFile;
+    var classMapFilePathBase = options.configFilePath || "";
+    var classMapFilePath = path.join(classMapFilePathBase, options.classMapFile);
 
     try {
       var classMap = yaml.safeLoad(fs.readFileSync(classMapFilePath, "utf8")); // loads either YAML or JSON

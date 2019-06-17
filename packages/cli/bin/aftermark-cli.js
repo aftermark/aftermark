@@ -9,12 +9,13 @@ function logError(msg) {
   log();
 }
 
-function applyPlugins(plugins, dom) {
+function applyPlugins(plugins, configFilePath, dom) {
   Object.keys(plugins).forEach(function (pluginName) {
     try {
       var plugin = require("".concat(process.cwd(), "/node_modules/").concat(pluginName));
 
       var pluginOptions = plugins[pluginName];
+      pluginOptions.configFilePath = configFilePath;
       dom = plugin(dom, pluginOptions);
     } catch (e) {
       logError("".concat(pluginName, " -- ") + e);
@@ -44,6 +45,10 @@ function exportFile(file, outputDir, updatedDom) {
   });
 }
 
+var fs$1 = require("fs");
+
+var path$1 = require("path");
+
 var pkg = require("../package.json");
 
 var cosmiconfig = require("cosmiconfig");
@@ -56,13 +61,25 @@ function getConfig() {
   var result = explorer.searchSync();
 
   if (result) {
-    result.config.debugMode && (commandNameAndVer += " [build ".concat(startTime.toLocaleTimeString(), "]"));
+    result.config.configFilePath = path$1.dirname(result.filepath);
     result.config.commandName = commandName;
-    result.config.commandNameAndVer = commandNameAndVer;
+    result.config.commandNameAndVer = updateCmdNameAndVer(commandNameAndVer);
     result.config.startTime = startTime;
     return result.config;
   } else {
     throw new Error("".concat(commandNameAndVer, " couldn't find a config file."));
+  }
+
+  function updateCmdNameAndVer(name) {
+    // if debugging, add this script's modified time to the name
+    // so it appears in logging.
+    if (result.config.debugMode) {
+      var buildTime = fs$1.statSync(__filename);
+      var buildTimeStr = new Date(buildTime.mtime).toLocaleString();
+      return name += " [build ".concat(buildTimeStr, "]");
+    } else {
+      return name;
+    }
   }
 }
 
@@ -95,14 +112,15 @@ var JSDOM = require("jsdom").JSDOM;
 
 (function () {
   try {
-    var config = getConfig(); // get array of filenames to process
+    var config = getConfig(); // get array of filenames to process; make input path relative to
+    // aftermark config file, which may not be process.cwd()
 
-    var files = glob.sync(config.input); // get array of promised modified doms;
+    var files = glob.sync(config.configFilePath + "/" + config.input); // get array of promised modified doms;
     // export as files if not in bufferMode
 
     var promisedDomsSerialized = files.map(function (file) {
       return JSDOM.fromFile(file).then(function (dom) {
-        var updatedDom = applyPlugins(config.plugins, dom);
+        var updatedDom = applyPlugins(config.plugins, config.configFilePath, dom);
         !config.bufferMode && exportFile(file, config.output, updatedDom);
         return updatedDom.serialize();
       });
