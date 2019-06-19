@@ -9,7 +9,8 @@ module.exports = {
     "plugin:prettier/recommended"
   ],
   "parserOptions": {
-    "sourceType": "module"
+    "sourceType": "module",
+    "ecmaVersion": 8 // allow async/await
   },
   "plugins": [
     "prettier" // ensures .prettierrc is honored
