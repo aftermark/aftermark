@@ -6,7 +6,7 @@ const pluginName = "funcdafy";
 const plugin = require(`@aftermark/${pluginName}`);
 const fixtures = path.join(__dirname, "fixtures");
 
-test("@aftermark/funcdafy adds classes from class map correctly", () => {
+test(`@aftermark/${pluginName} adds classes from class map correctly`, () => {
   expect(compare()).toBe(true);
 });
 
